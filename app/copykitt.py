@@ -1,6 +1,7 @@
 import os 
 import openai 
 import argparse
+import re
 
 # Load API key from environment variable
 openai.api_key = os.getenv("OPENAI_API_KEY") 
@@ -14,12 +15,15 @@ def main():
   user_input = args.input 
 
   print(f"User input: {user_input}")
-  generate_branding_snippet(user_input)
+  result = generate_branding_snippet(user_input)
+  keywords = generate_keywords(user_input)
+  print(result)
+  print(keywords)
   pass
 
-def generate_branding_snippet(arg_prompt: str):
+def generate_branding_snippet(arg_input: str):
   # create a prompt for GPT 
-  prompt = f"Short upbeat branding snippet for {arg_prompt}: "
+  prompt = f"Short upbeat branding snippet for {arg_input}: "
 
   # access GPT text completion using prompt
   response = openai.Completion.create(
@@ -29,7 +33,46 @@ def generate_branding_snippet(arg_prompt: str):
     max_tokens = 32
   )
 
-  print(response)
+  # extract the generated text from the response object 
+  branding_text: str = response["choices"][0]["text"]
+
+  # strip white space
+  branding_text = branding_text.strip() 
+
+  # check if an ellipsis is required on truncated statements
+  last_char = branding_text[-1] 
+  if last_char not in {".", "!", "?"}:
+    branding_text += "..."
+
+  return branding_text
+
+
+def generate_keywords(arg_input: str):
+  # create a prompt for GPT 
+  prompt = f"Create related branding keywords for {arg_input}, separated by comma: "
+
+  # access GPT text completion using prompt
+  response = openai.Completion.create(
+    model = "davinci-instruct-beta-v3",
+    prompt = prompt,
+    temperature = 0,
+    max_tokens = 32
+  )
+
+  # extract the generated text from the response object 
+  keywords_text: str = response["choices"][0]["text"]
+
+  # strip white space
+  keywords_text = keywords_text.lower().strip() 
+
+  # put the keywords into a list
+  keywords_list = re.split(",|\n|-", keywords_text)  # split keywords by comma or newline
+  keywords_list = [k.strip() for k in keywords_list] # remove whitespace from each keyword
+  keywords_list = [k for k in keywords_list if len(k) > 0] # remove any empty strings in list
+
+  return keywords_list
 
 if __name__ == "__main__":
   main()
+
+# i am at 34:20 on the yt
