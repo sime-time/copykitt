@@ -6,24 +6,30 @@ import re
 # Load API key from environment variable
 openai.api_key = os.getenv("OPENAI_API_KEY") 
 
-def main():
-  print("Running Main!")
+# Max length of user input argument
+MAX_INPUT_LENGTH = 12
 
+def main():
   parser = argparse.ArgumentParser()
   parser.add_argument("--input", "-i", type=str, required=True)
   args = parser.parse_args()
   user_input = args.input 
 
   print(f"User input: {user_input}")
-  result = generate_branding_snippet(user_input)
-  keywords = generate_keywords(user_input)
-  print(result)
-  print(keywords)
-  pass
+  if validate_length(user_input):
+    generate_branding_snippet(user_input)
+    generate_keywords(user_input)
+  else: 
+    raise ValueError(f"Input length is too long. Must be under {MAX_INPUT_LENGTH}")
+
+def validate_length(arg_input: str) -> bool:
+  return (len(arg_input) < MAX_INPUT_LENGTH)
+
 
 def generate_branding_snippet(arg_input: str):
   # create a prompt for GPT 
   prompt = f"Short upbeat branding snippet for {arg_input}: "
+  print(prompt)
 
   # access GPT text completion using prompt
   response = openai.Completion.create(
@@ -44,6 +50,7 @@ def generate_branding_snippet(arg_input: str):
   if last_char not in {".", "!", "?"}:
     branding_text += "..."
 
+  print(f"Snippet: {branding_text}")
   return branding_text
 
 
@@ -70,6 +77,7 @@ def generate_keywords(arg_input: str):
   keywords_list = [k.strip() for k in keywords_list] # remove whitespace from each keyword
   keywords_list = [k for k in keywords_list if len(k) > 0] # remove any empty strings in list
 
+  print(f"Result: {keywords_list}")
   return keywords_list
 
 if __name__ == "__main__":
