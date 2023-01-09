@@ -22,13 +22,13 @@ def main():
   else: 
     raise ValueError(f"Input length is too long. Must be under {MAX_INPUT_LENGTH}")
 
-def validate_length(arg_input: str) -> bool:
-  return (len(arg_input) < MAX_INPUT_LENGTH)
+def validate_length(input_prompt: str) -> bool:
+  return (len(input_prompt) < MAX_INPUT_LENGTH)
 
 
-def generate_branding_snippet(arg_input: str):
+def generate_branding_snippet(input_prompt: str):
   # create a prompt for GPT 
-  prompt = f"Short upbeat branding snippet for {arg_input}: "
+  prompt = f"Short upbeat branding snippet for {input_prompt}: "
   print(prompt)
 
   # access GPT text completion using prompt
@@ -54,9 +54,9 @@ def generate_branding_snippet(arg_input: str):
   return branding_text
 
 
-def generate_keywords(arg_input: str):
+def generate_keywords(input_prompt: str):
   # create a prompt for GPT 
-  prompt = f"Create related branding keywords for {arg_input}, separated by comma: "
+  prompt = f"Create related branding keywords for {input_prompt}, separated by comma: "
 
   # access GPT text completion using prompt
   response = openai.Completion.create(
@@ -82,5 +82,3 @@ def generate_keywords(arg_input: str):
 
 if __name__ == "__main__":
   main()
-
-# i am at 34:20 on the yt
