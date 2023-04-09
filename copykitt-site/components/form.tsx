@@ -2,13 +2,20 @@ interface FormProps {
   prompt: string;
   setPrompt: any;
   onSubmit: any;
+  isLoading: boolean;
+  characterLimit: number;
 }
 
 
 const Form: React.FC<FormProps> = (props) => {
+  const isPromptValid = props.prompt.length < props.characterLimit;
 
-const characterLimit = 32;
-const isPromptValid = props.prompt.length <= 32;
+  // use wrapper func to prevent text greater than 32 characters in length
+  const updatePromptValue = (text: string) => {
+    if (text.length <= props.characterLimit) {
+      props.setPrompt(text);
+    }
+  }
 
   return (
     <>      
@@ -17,10 +24,10 @@ const isPromptValid = props.prompt.length <= 32;
         type="text" 
         placeholder="coffee" 
         value={props.prompt}
-        onChange={(e) => props.setPrompt(e.currentTarget.value)}
+        onChange={(e) => updatePromptValue(e.currentTarget.value)}
       ></input>
-      <div>{props.prompt.length}/{characterLimit}</div>
-      <button onClick={props.onSubmit}>Submit</button>
+      <div>{props.prompt.length}/{props.characterLimit}</div>
+      <button onClick={props.onSubmit} disabled={props.isLoading || !isPromptValid}>Submit</button>
     </>
   );
 };
