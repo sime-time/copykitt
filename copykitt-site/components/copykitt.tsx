@@ -1,4 +1,6 @@
 import React from "react"
+import Form from "../components/form";
+import Results from "../components/results"
 
 const CopyKitt: React.FC = () => {
   const ENDPOINT: string = `https://vsapemn43m.execute-api.us-east-2.amazonaws.com/prod/generate_snippet_and_keywords`
@@ -21,31 +23,24 @@ const CopyKitt: React.FC = () => {
     setHasResult(true);
   }
 
-  let resultsElement = null; 
+  const onReset = () => {
+    setPrompt("");
+    setHasResult(false);
+  }
+
+  let displayedElement = null; 
 
   if (hasResult) {
-    resultsElement = (
-      <div>
-        Here are your results: 
-        <div>Snippet: {snippet}</div>
-        <div>Keywords: {keywords.join(", ")}</div>
-      </div>
-    );
+    displayedElement = (<Results prompt={prompt} snippet={snippet} keywords={keywords} onBack={onReset}/>);
+  } else {
+    displayedElement = (<Form prompt={prompt} setPrompt={setPrompt} onSubmit={onSubmit} />);
   }
 
 
   return (
     <>
       <h1>CopyKitt!</h1>
-      <p>Tell me what your brand is about and I will generate copy and keywords for you.</p>
-      <input 
-        type="text" 
-        placeholder="coffee" 
-        value={prompt}
-        onChange={(e) => setPrompt(e.currentTarget.value)}
-      ></input>
-      <button onClick={onSubmit}>Submit</button>
-      {resultsElement}
+      {displayedElement}
     </>
   );
 };
